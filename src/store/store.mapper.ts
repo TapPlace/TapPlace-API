@@ -2,7 +2,7 @@ import { HttpException, Inject } from '@nestjs/common';
 import baseException from 'src/baseException';
 import { Store } from 'src/entities/store.entity';
 import { GetPaysCehckDto } from 'src/pay/dto/get-pays-check.dto';
-import { Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { AroundStoreDto } from './dto/around-store';
 import { CreateStoreDto } from './dto/create-store';
 
@@ -10,6 +10,8 @@ export class StoreMapper {
   constructor(
     @Inject('STORE_REPOSITORY')
     private storeRepository: Repository<Store>,
+    @Inject('DATA_SOURCE')
+    private queryRunner: QueryRunner,
   ) {}
 
   // 주변찾기 쿼리
@@ -31,6 +33,30 @@ export class StoreMapper {
       if (error.sqlMessage) throw new HttpException(error.sqlMessage, 400);
       throw new HttpException(`알 수 없는 오류`, 500);
     }
+
+    return stores;
+  }
+
+  async aroundStore2(aroundStoreDto: AroundStoreDto) {
+    const { x1, y1, distance, pays, user_id } = aroundStoreDto;
+    const paysToString = pays.map((pay) => `'${pay}'`).join(',');
+    const stores = await this.queryRunner.query(`
+      select sp.*, b.user_id as isBookmark
+      from(
+        select s.*,GROUP_CONCAT(p.pay) as pays
+        from(
+          select *,ROUND((6371*acos(cos(radians(${y1}))*cos(radians(y))*cos(radians(x) -radians(${x1}))+sin(radians(${y1}))*sin(radians(y)))),3) AS distance
+          from store
+          having distance <= ${distance}
+          ) s
+        join pay p on s.store_id = p.store_id AND 
+        p.pay IN (${paysToString})
+        GROUP by s.store_id
+        order by distance
+        ) sp
+      left join bookmark b
+      on sp.store_id = b.store_id AND b.user_id = '${user_id}';
+      `);
 
     return stores;
   }

@@ -36,6 +36,12 @@ export class StoreController {
     return await this.storeService.aroundStore(aroundStoreDto);
   }
 
+  @HttpCode(200)
+  @Post('around2')
+  async aroundStore2(@Body() aroundStoreDto: AroundStoreDto) {
+    return await this.storeService.aroundStore2(aroundStoreDto);
+  }
+
   // @Post('around2')
   // async aroundStore2(@Body() aroundStoreDto: AroundStoreDto) {
   //   return await this.storeService.aroundStore2(aroundStoreDto);

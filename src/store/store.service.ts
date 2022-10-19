@@ -139,4 +139,20 @@ export class StoreService {
 
     return result;
   }
+
+  async aroundStore2(aroundStoreDto: AroundStoreDto) {
+    // 전달받은 pay 배열
+    const { pays, user_id } = aroundStoreDto;
+    // 주변 가게 먼저 가져옴
+    const stores = await this.storeMapper.aroundStore2(aroundStoreDto);
+
+    stores.map((store) => {
+      store['pays'] = store['pays'].split(',');
+      if (store['isBookmark']) store['isBookmark'] = true;
+      else store['isBookmark'] = false;
+    });
+    return {
+      stores,
+    };
+  }
 }
