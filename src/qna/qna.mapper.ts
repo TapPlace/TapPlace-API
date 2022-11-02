@@ -1,6 +1,7 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { Qna } from 'src/entities/qna.entity';
 import { Repository } from 'typeorm';
+import { CreateQnaWebDto } from './dto/create-qna-web.dto';
 import { CreateQnaDto } from './dto/create-qna.dto';
 
 @Injectable()
@@ -23,6 +24,27 @@ export class QnaMapper {
         title,
         content,
         os,
+        store_id,
+        write_date: () => 'left(NOW(),19)',
+      })
+      .execute();
+
+    return true;
+  }
+
+  async createQnaWeb(createqnaWebDto: CreateQnaWebDto): Promise<any> {
+    const { title, content, store_id } = createqnaWebDto;
+
+    const result = await this.qnaRepository
+      .createQueryBuilder()
+      .insert()
+      .into(Qna)
+      .values({
+        user_id: 'web',
+        category: 'edit',
+        title,
+        content,
+        os: 'web',
         store_id,
         write_date: () => 'left(NOW(),19)',
       })

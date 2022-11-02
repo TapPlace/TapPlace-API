@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { response } from 'express';
 import { UserMapper } from 'src/user/user.mapper';
+import { CreateQnaWebDto } from './dto/create-qna-web.dto';
 import { CreateQnaDto } from './dto/create-qna.dto';
 import { UpdateQnaDto } from './dto/update-qna.dto';
 import { QnaMapper } from './qna.mapper';
@@ -14,6 +15,9 @@ export class QnaService {
   ) {}
   async createQna(createQnaDto: CreateQnaDto) {
     return await this.qnaMapper.createQna(createQnaDto);
+  }
+  async createQnaWeb(createQnaWebDto: CreateQnaWebDto) {
+    return await this.qnaMapper.createQnaWeb(createQnaWebDto);
   }
 
   async findQna(ct: string, answer_check, page: number) {

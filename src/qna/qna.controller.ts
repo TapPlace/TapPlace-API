@@ -15,8 +15,7 @@ import { UpdateQnaDto } from './dto/update-qna.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { adminPipe, userPipe } from 'src/auth/auth.pipe';
-import { keyCheck } from 'src/auth/keyCheck-decorators';
-import { keyPipe } from 'src/auth/keyPipes';
+import { CreateQnaWebDto } from './dto/create-qna-web.dto';
 
 @Controller('qna')
 export class QnaController {
@@ -26,7 +25,12 @@ export class QnaController {
   @UseGuards(AuthGuard())
   async create(@Body() createQnaDto: CreateQnaDto, @GetUser(userPipe) user) {
     await this.qnaService.createQna(createQnaDto);
+    throw new HttpException('ok', 200);
+  }
 
+  @Post('/web')
+  async createQnaWen(@Body() createQnaWebDto: CreateQnaWebDto) {
+    await this.qnaService.createQnaWeb(createQnaWebDto);
     throw new HttpException('ok', 200);
   }
 
